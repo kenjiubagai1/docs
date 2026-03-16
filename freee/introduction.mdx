@@ -1,0 +1,41 @@
+---
+title: "freee会計 連携ガイド"
+description: "freee会計 APIを使ってシステムを連携する方法を解説します"
+---
+
+## freee会計とは
+
+freee会計は、日本の中小企業向けクラウド会計・人事管理ソフトウェアです。freee APIを利用することで、外部システムとfreeeを連携し、データの同期・自動化・カスタム統合が可能になります。
+
+## 主な機能
+
+<CardGroup cols={2}>
+  <Card title="取引管理" icon="receipt" href="/freee/deals">
+    売上・経費などの取引データを登録・取得します
+  </Card>
+  <Card title="請求書管理" icon="file-invoice" href="/freee/invoices">
+    請求書の作成・ステータス管理・入金消込を行います
+  </Card>
+  <Card title="認証設定" icon="lock" href="/freee/authentication">
+    OAuth 2.0を使ったセキュアな認証フローを設定します
+  </Card>
+  <Card title="APIリファレンス" icon="code" href="https://developer.freee.co.jp/reference/accounting/reference">
+    全エンドポイントの詳細仕様を参照します
+  </Card>
+</CardGroup>
+
+## 主なユースケース
+
+- **Eコマース連携**: 受注データから自動的に請求書・仕訳を作成
+- **銀行照合**: 銀行取引と請求書を自動マッチング
+- **経費精算自動化**: 経費申請の承認・却下をWebhookでトリガー
+- **マルチシステム連携**: 受注・売上・仕訳をまたぐワークフローの自動化
+
+## 開発者向けリソース
+
+| リソース | URL |
+|----------|-----|
+| 開発者コミュニティ | https://developer.freee.co.jp |
+| APIリファレンス | https://developer.freee.co.jp/reference/accounting/reference |
+| クイックスタート | https://developer.freee.co.jp/startguide |
+| サンドボックス | テスト環境として利用可能 |

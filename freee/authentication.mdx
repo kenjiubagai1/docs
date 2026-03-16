@@ -1,0 +1,92 @@
+---
+title: "認証設定 (OAuth 2.0)"
+description: "freee APIはOAuth 2.0 Authorization Code Flowで認証します"
+---
+
+## 概要
+
+freee APIはOAuth 2.0を採用しています。ユーザーの許可を得てアクセストークンを取得し、APIリクエストのAuthorizationヘッダーに付与します。
+
+## エンドポイント
+
+| 種別 | URL |
+|------|-----|
+| 認可エンドポイント | `https://accounts.secure.freee.co.jp/public_api/authorize` |
+| トークンエンドポイント | `https://accounts.secure.freee.co.jp/public_api/token` |
+| APIベースURL | `https://api.freee.co.jp/api/1` |
+
+## 認証フロー
+
+<Steps>
+  <Step title="アプリ登録">
+    [freee Developers](https://developer.freee.co.jp) でアプリを登録し、`client_id` と `client_secret` を取得します。
+  </Step>
+  <Step title="認可リクエスト">
+    ユーザーを認可エンドポイントにリダイレクトします。
+
+    ```
+    GET https://accounts.secure.freee.co.jp/public_api/authorize
+      ?client_id={CLIENT_ID}
+      &redirect_uri={REDIRECT_URI}
+      &response_type=code
+    ```
+  </Step>
+  <Step title="認可コード受け取り">
+    ユーザーが許可すると、指定した `redirect_uri` に `code` パラメータ付きでリダイレクトされます。認可コードの有効期限は **10分** です。
+  </Step>
+  <Step title="アクセストークン取得">
+    認可コードをトークンエンドポイントに送信してトークンを取得します。
+
+    ```bash
+    curl -X POST https://accounts.secure.freee.co.jp/public_api/token \
+      -d "grant_type=authorization_code" \
+      -d "client_id={CLIENT_ID}" \
+      -d "client_secret={CLIENT_SECRET}" \
+      -d "code={CODE}" \
+      -d "redirect_uri={REDIRECT_URI}"
+    ```
+
+    レスポンス例:
+    ```json
+    {
+      "access_token": "...",
+      "token_type": "bearer",
+      "expires_in": 21600,
+      "refresh_token": "...",
+      "scope": "read write",
+      "created_at": 1234567890
+    }
+    ```
+  </Step>
+  <Step title="APIリクエスト">
+    取得したアクセストークンをAuthorizationヘッダーに付与します。
+
+    ```bash
+    curl https://api.freee.co.jp/api/1/companies \
+      -H "Authorization: Bearer {ACCESS_TOKEN}"
+    ```
+  </Step>
+</Steps>
+
+## トークンの有効期限
+
+| トークン | 有効期限 |
+|----------|----------|
+| アクセストークン | **6時間**（最大90日） |
+| リフレッシュトークン | 無期限（新しいアクセストークン取得に使用） |
+
+## アクセストークンの更新
+
+アクセストークンが期限切れになったらリフレッシュトークンで更新します。
+
+```bash
+curl -X POST https://accounts.secure.freee.co.jp/public_api/token \
+  -d "grant_type=refresh_token" \
+  -d "client_id={CLIENT_ID}" \
+  -d "client_secret={CLIENT_SECRET}" \
+  -d "refresh_token={REFRESH_TOKEN}"
+```
+
+## ローカル開発時の設定
+
+ローカルテスト用のリダイレクトURIには `urn:ietf:wg:oauth:2.0:oob` が使用できます。

@@ -35,6 +35,25 @@
         ]
       },
       {
+        "tab": "freee会計 連携",
+        "groups": [
+          {
+            "group": "はじめに",
+            "pages": [
+              "freee/introduction",
+              "freee/authentication"
+            ]
+          },
+          {
+            "group": "APIリファレンス",
+            "pages": [
+              "freee/deals",
+              "freee/invoices"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "API Reference",
         "groups": [
           {

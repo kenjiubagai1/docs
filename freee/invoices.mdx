@@ -1,0 +1,167 @@
+---
+title: "請求書 (Invoices) API"
+description: "請求書の作成・ステータス管理・入金消込を行います"
+---
+
+## 概要
+
+請求書APIでは、freee会計上の請求書を操作します。
+
+**ベースURL**: `https://api.freee.co.jp/api/1/invoices`
+
+## 請求書ステータス
+
+| ステータス | 説明 |
+|------------|------|
+| `draft` | 下書き |
+| `applying` | 申請中 |
+| `remanded` | 差し戻し |
+| `rejected` | 却下 |
+| `approved` | 承認済み |
+| `unsubmitted` | 送付待ち |
+| `submitted` | 送付済み |
+
+## 入金ステータス
+
+| ステータス | 説明 |
+|------------|------|
+| `unsettled` | 未入金 |
+| `settled` | 入金済み |
+
+---
+
+## 請求書一覧の取得
+
+```bash
+GET /api/1/invoices
+```
+
+**パラメータ（クエリ）**
+
+| パラメータ | 型 | 必須 | 説明 |
+|------------|-----|------|------|
+| `company_id` | integer | ✅ | 事業所ID |
+| `partner_id` | integer | | 取引先ID |
+| `invoice_status` | string | | 請求書ステータス |
+| `payment_status` | string | | 入金ステータス |
+| `start_issue_date` | string | | 発行日（開始）: `YYYY-MM-DD` |
+| `end_issue_date` | string | | 発行日（終了）: `YYYY-MM-DD` |
+| `offset` | integer | | オフセット |
+| `limit` | integer | | 取得件数（最大: 100） |
+
+**リクエスト例**
+
+```bash
+curl "https://api.freee.co.jp/api/1/invoices?company_id=1234&invoice_status=submitted&payment_status=unsettled" \
+  -H "Authorization: Bearer {ACCESS_TOKEN}"
+```
+
+**レスポンス例**
+
+```json
+{
+  "invoices": [
+    {
+      "id": 1,
+      "company_id": 1234,
+      "issue_date": "2024-01-15",
+      "due_date": "2024-01-31",
+      "invoice_number": "INV-2024-001",
+      "title": "1月分 システム開発費",
+      "total_amount": 110000,
+      "invoice_status": "submitted",
+      "payment_status": "unsettled",
+      "partner_name": "株式会社サンプル"
+    }
+  ],
+  "meta": {
+    "total_count": 1
+  }
+}
+```
+
+---
+
+## 請求書の作成
+
+```bash
+POST /api/1/invoices
+```
+
+**リクエストボディ**
+
+```json
+{
+  "company_id": 1234,
+  "issue_date": "2024-01-15",
+  "due_date": "2024-01-31",
+  "partner_id": 56,
+  "invoice_number": "INV-2024-001",
+  "title": "1月分 システム開発費",
+  "invoice_contents": [
+    {
+      "order": 1,
+      "type": "normal",
+      "qty": 1,
+      "unit": "式",
+      "unit_price": 100000,
+      "description": "システム開発費",
+      "tax_code": 1
+    }
+  ],
+  "invoice_status": "draft"
+}
+```
+
+**リクエスト例**
+
+```bash
+curl -X POST https://api.freee.co.jp/api/1/invoices \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "company_id": 1234,
+    "issue_date": "2024-01-15",
+    "due_date": "2024-01-31",
+    "partner_id": 56,
+    "title": "1月分 システム開発費",
+    "invoice_contents": [
+      {"order":1,"type":"normal","qty":1,"unit":"式","unit_price":100000,"description":"システム開発費","tax_code":1}
+    ],
+    "invoice_status": "draft"
+  }'
+```
+
+---
+
+## 請求書の更新
+
+```bash
+PUT /api/1/invoices/{id}
+```
+
+ステータス変更（例: 下書き → 送付済み）も同エンドポイントで行います。
+
+```bash
+curl -X PUT https://api.freee.co.jp/api/1/invoices/1 \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{"company_id":1234,"invoice_status":"submitted"}'
+```
+
+---
+
+## 請求書の削除
+
+```bash
+DELETE /api/1/invoices/{id}
+```
+
+```bash
+curl -X DELETE "https://api.freee.co.jp/api/1/invoices/1?company_id=1234" \
+  -H "Authorization: Bearer {ACCESS_TOKEN}"
+```
+
+<Warning>
+削除できるのは `draft`（下書き）ステータスの請求書のみです。承認済みや送付済みの請求書は削除できません。
+</Warning>

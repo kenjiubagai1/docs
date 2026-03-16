@@ -1,0 +1,142 @@
+---
+title: "取引 (Deals) API"
+description: "売上・経費などの取引データを登録・取得します"
+---
+
+## 概要
+
+取引APIでは、freee会計上の「取引（収入・支出）」を操作します。
+
+**ベースURL**: `https://api.freee.co.jp/api/1/deals`
+
+## 取引の種別
+
+| 種別 (`type`) | 説明 |
+|---------------|------|
+| `income` | 収入（売上） |
+| `expense` | 支出（経費） |
+
+## 決済ステータス
+
+| ステータス | 説明 |
+|------------|------|
+| `settled` | 決済済み |
+| `unsettled` | 未決済 |
+
+---
+
+## 取引一覧の取得
+
+```bash
+GET /api/1/deals
+```
+
+**パラメータ（クエリ）**
+
+| パラメータ | 型 | 必須 | 説明 |
+|------------|-----|------|------|
+| `company_id` | integer | ✅ | 事業所ID |
+| `type` | string | | `income` または `expense` |
+| `start_issue_date` | string | | 発生日（開始）: `YYYY-MM-DD` |
+| `end_issue_date` | string | | 発生日（終了）: `YYYY-MM-DD` |
+| `offset` | integer | | オフセット（デフォルト: 0） |
+| `limit` | integer | | 取得件数（最大: 100） |
+
+**リクエスト例**
+
+```bash
+curl "https://api.freee.co.jp/api/1/deals?company_id=1234&type=income&limit=10" \
+  -H "Authorization: Bearer {ACCESS_TOKEN}"
+```
+
+**レスポンス例**
+
+```json
+{
+  "deals": [
+    {
+      "id": 1,
+      "company_id": 1234,
+      "issue_date": "2024-01-15",
+      "type": "income",
+      "amount": 110000,
+      "due_amount": 0,
+      "status": "settled",
+      "partner_name": "株式会社サンプル",
+      "ref_number": "INV-001"
+    }
+  ],
+  "meta": {
+    "total_count": 1
+  }
+}
+```
+
+---
+
+## 取引の登録
+
+```bash
+POST /api/1/deals
+```
+
+**リクエストボディ**
+
+```json
+{
+  "company_id": 1234,
+  "issue_date": "2024-01-15",
+  "type": "income",
+  "ref_number": "INV-001",
+  "details": [
+    {
+      "account_item_id": 100,
+      "tax_code": 1,
+      "amount": 100000,
+      "description": "システム開発費"
+    }
+  ],
+  "payments": [
+    {
+      "date": "2024-01-31",
+      "from_walletable_type": "bank_account",
+      "from_walletable_id": 1,
+      "amount": 110000
+    }
+  ]
+}
+```
+
+**リクエスト例**
+
+```bash
+curl -X POST https://api.freee.co.jp/api/1/deals \
+  -H "Authorization: Bearer {ACCESS_TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{"company_id":1234,"issue_date":"2024-01-15","type":"income","details":[{"account_item_id":100,"tax_code":1,"amount":100000}]}'
+```
+
+---
+
+## 取引の削除
+
+```bash
+DELETE /api/1/deals/{id}
+```
+
+**パラメータ（パス）**
+
+| パラメータ | 型 | 説明 |
+|------------|-----|------|
+| `id` | integer | 取引ID |
+
+**パラメータ（クエリ）**
+
+| パラメータ | 型 | 必須 | 説明 |
+|------------|-----|------|------|
+| `company_id` | integer | ✅ | 事業所ID |
+
+```bash
+curl -X DELETE "https://api.freee.co.jp/api/1/deals/1?company_id=1234" \
+  -H "Authorization: Bearer {ACCESS_TOKEN}"
+```
