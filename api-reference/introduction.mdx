@@ -1,28 +1,27 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'はじめに'
+description: 'APIエンドポイントのリファレンスセクション'
 ---
 
 <Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
+  APIリファレンスドキュメントを作成しない場合は、api-referenceフォルダを削除してこのセクションを省略できます。
 </Note>
 
-## Welcome
+## ようこそ
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+APIドキュメントの作成方法は2種類あります: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) と [MDXコンポーネント](https://mintlify.com/docs/api-playground/mdx/configuration)。スターターキットでは以下のOpenAPI仕様を使用しています。
 
 <Card
-  title="Plant Store Endpoints"
+  title="Plant Store エンドポイント"
   icon="leaf"
   href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
 >
-  View the OpenAPI specification file
+  OpenAPI仕様ファイルを確認する
 </Card>
 
-## Authentication
+## 認証
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+すべてのAPIエンドポイントはBearerトークンで認証されます。トークンは仕様ファイルから読み込まれます。
 
 ```json
 "security": [
